@@ -6,7 +6,7 @@ import { CACHE_MANAGER, CacheKey, CacheTTL } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
 import { CreateUserDto } from './create-user.dto';
 import { UpdateUserDto } from './update-user.dto';
-import { Block } from 'src/block/block.entity';
+import { Block } from '../block/block.entity';
 import { SearchUserDto } from './search-user.dto';
 
 @Injectable()
@@ -86,13 +86,10 @@ export class UserService {
     }
 
     if (minAge && maxAge) {
-      const today = new Date();
-      const minBirthdate = new Date(
-        today.setFullYear(today.getFullYear() - maxAge),
-      );
-      const maxBirthdate = new Date(
-        today.setFullYear(today.getFullYear() - minAge),
-      );
+      const minBirthdate = new Date();
+      minBirthdate.setFullYear(minBirthdate.getFullYear() - maxAge);
+      const maxBirthdate = new Date();
+      maxBirthdate.setFullYear(maxBirthdate.getFullYear() - minAge);
       queryBuilder.andWhere(
         'user.birthdate BETWEEN :minBirthdate AND :maxBirthdate',
         {
@@ -115,11 +112,14 @@ export class UserService {
     }
 
     if (userId) {
-      const blockedUsers = await this.blockRepository.find({
+      const blockedUsers = await this.blockRepository?.find({
         where: { blocker: { id: userId } },
+        relations: ['blocked'],
       });
-      const blockedUserIds = blockedUsers.map((block) => block.blocked.id);
-      if (blockedUserIds.length > 0) {
+
+      const blockedUserIds = blockedUsers?.map((block) => block.blocked.id);
+
+      if (blockedUserIds?.length > 0) {
         queryBuilder.andWhere('user.id NOT IN (:...blockedUserIds)', {
           blockedUserIds,
         });
@@ -133,7 +133,7 @@ export class UserService {
 
   private async invalidateSearchCache(): Promise<void> {
     const keys = await this.cacheManager.store.keys();
-    const searchKeys = keys.filter((key) => key.startsWith('search_'));
+    const searchKeys = keys?.filter((key) => key.startsWith('search_'));
     await Promise.all(searchKeys.map((key) => this.cacheManager.del(key)));
   }
 }

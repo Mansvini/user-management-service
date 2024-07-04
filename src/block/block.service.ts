@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Block } from './block.entity';
 import { Repository } from 'typeorm';
-import { User } from 'src/user/user.entity';
+import { User } from '../user/user.entity';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
 
@@ -41,7 +41,7 @@ export class BlockService {
 
   private async clearSearchCache(userId: number): Promise<void> {
     const keys = await this.cacheManager.store.keys();
-    const searchKeys = keys.filter(
+    const searchKeys = keys?.filter(
       (key) => key.includes(`search_`) && key.includes(`_${userId}`),
     );
     await Promise.all(searchKeys.map((key) => this.cacheManager.del(key)));
