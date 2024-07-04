@@ -4,9 +4,10 @@ import { UserService } from './user.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './user.entity';
 import { CacheModule } from '@nestjs/cache-manager';
+import { Block } from 'src/block/block.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User]), CacheModule.register()],
+  imports: [TypeOrmModule.forFeature([User, Block]), CacheModule.register()],
   controllers: [UserController],
   providers: [UserService],
 })

@@ -20,6 +20,7 @@ export class UserService {
 
   async create(createUserDto: CreateUserDto): Promise<User> {
     await this.cacheManager.del('users_all');
+    await this.invalidateSearchCache();
     return this.userRepository.save(createUserDto);
   }
 
@@ -50,6 +51,7 @@ export class UserService {
   async update(id: number, updateUserDto: UpdateUserDto): Promise<any> {
     await this.cacheManager.del('users_all');
     await this.cacheManager.del(`user_${id}`);
+    await this.invalidateSearchCache();
     const result = await this.userRepository.update(id, updateUserDto);
     return result;
   }
@@ -57,6 +59,7 @@ export class UserService {
   async remove(id: number): Promise<void> {
     await this.cacheManager.del('users_all');
     await this.cacheManager.del(`user_${id}`);
+    await this.invalidateSearchCache();
     await this.userRepository.delete(id);
   }
 
@@ -68,7 +71,7 @@ export class UserService {
     maxAge?: number,
     userId?: number,
   ): Promise<User[]> {
-    const cacheKey = `search_${username}_${minAge}_${maxAge}`;
+    const cacheKey = `search_${username}_${minAge}_${maxAge}_${userId}`;
     const cachedSearchResults = await this.cacheManager.get<User[]>(cacheKey);
     if (cachedSearchResults) {
       return cachedSearchResults;
@@ -126,5 +129,11 @@ export class UserService {
     const users = await queryBuilder.getMany();
     await this.cacheManager.set(cacheKey, users, 0);
     return users;
+  }
+
+  private async invalidateSearchCache(): Promise<void> {
+    const keys = await this.cacheManager.store.keys();
+    const searchKeys = keys.filter((key) => key.startsWith('search_'));
+    await Promise.all(searchKeys.map((key) => this.cacheManager.del(key)));
   }
 }
