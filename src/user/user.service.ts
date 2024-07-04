@@ -1,40 +1,73 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './user.entity';
+import { CACHE_MANAGER, CacheKey, CacheTTL } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
 
-  create(user: User): Promise<User> {
+  async create(user: User): Promise<User> {
+    await this.cacheManager.del('users_all');
     return this.userRepository.save(user);
   }
 
-  findAll(): Promise<User[]> {
-    return this.userRepository.find();
+  @CacheKey('users_all')
+  @CacheTTL(300)
+  async findAll(): Promise<User[]> {
+    const cachedUsers = await this.cacheManager.get<User[]>('users_all');
+    if (cachedUsers) {
+      return cachedUsers;
+    }
+    const users = await this.userRepository.find();
+    await this.cacheManager.set('users_all', users, 0);
+    return users;
   }
 
-  findOne(id: number): Promise<User> {
-    return this.userRepository.findOne({ where: { id } });
+  @CacheKey('users_one')
+  @CacheTTL(300)
+  async findOne(id: number): Promise<User> {
+    const cachedUser = await this.cacheManager.get<User>(`user_${id}`);
+    if (cachedUser) {
+      return cachedUser;
+    }
+    const user = await this.userRepository.findOne({ where: { id } });
+    await this.cacheManager.set(`user_${id}`, user, 0);
+    return user;
   }
 
-  update(id: number, user: User): Promise<any> {
-    return this.userRepository.update(id, user);
+  async update(id: number, user: User): Promise<any> {
+    await this.cacheManager.del('users_all');
+    await this.cacheManager.del(`user_${id}`);
+    const result = await this.userRepository.update(id, user);
+    return result;
   }
 
-  remove(id: number): Promise<void> {
-    return this.userRepository.delete(id).then(() => undefined);
+  async remove(id: number): Promise<void> {
+    await this.cacheManager.del('users_all');
+    await this.cacheManager.del(`user_${id}`);
+    await this.userRepository.delete(id);
   }
 
+  @CacheKey('search')
+  @CacheTTL(300)
   async search(
     username?: string,
     minAge?: number,
     maxAge?: number,
   ): Promise<User[]> {
+    const cacheKey = `search_${username}_${minAge}_${maxAge}`;
+    const cachedSearchResults = await this.cacheManager.get<User[]>(cacheKey);
+    if (cachedSearchResults) {
+      return cachedSearchResults;
+    }
+
     const queryBuilder = this.userRepository.createQueryBuilder('user');
 
     if (username) {
@@ -72,6 +105,8 @@ export class UserService {
       });
     }
 
-    return queryBuilder.getMany();
+    const users = await queryBuilder.getMany();
+    await this.cacheManager.set(cacheKey, users, 0);
+    return users;
   }
 }
