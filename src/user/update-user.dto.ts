@@ -1,19 +1,21 @@
 import { IsString, IsDate, IsOptional } from 'class-validator';
+import { Type } from 'class-transformer';
 
 export class UpdateUserDto {
-  @IsOptional()
   @IsString()
+  @IsOptional()
   name?: string;
 
-  @IsOptional()
   @IsString()
+  @IsOptional()
   surname?: string;
 
-  @IsOptional()
   @IsString()
+  @IsOptional()
   username?: string;
 
-  @IsOptional()
   @IsDate()
+  @Type(() => Date)
+  @IsOptional()
   birthdate?: Date;
 }

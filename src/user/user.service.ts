@@ -7,6 +7,7 @@ import { Cache } from 'cache-manager';
 import { CreateUserDto } from './create-user.dto';
 import { UpdateUserDto } from './update-user.dto';
 import { Block } from 'src/block/block.entity';
+import { SearchUserDto } from './search-user.dto';
 
 @Injectable()
 export class UserService {
@@ -66,11 +67,10 @@ export class UserService {
   @CacheKey('search')
   @CacheTTL(300)
   async search(
-    username?: string,
-    minAge?: number,
-    maxAge?: number,
+    searchUserDto?: SearchUserDto,
     userId?: number,
   ): Promise<User[]> {
+    const { username, minAge, maxAge } = searchUserDto;
     const cacheKey = `search_${username}_${minAge}_${maxAge}_${userId}`;
     const cachedSearchResults = await this.cacheManager.get<User[]>(cacheKey);
     if (cachedSearchResults) {
