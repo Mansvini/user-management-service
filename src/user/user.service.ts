@@ -4,6 +4,8 @@ import { Repository } from 'typeorm';
 import { User } from './user.entity';
 import { CACHE_MANAGER, CacheKey, CacheTTL } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
+import { CreateUserDto } from './create-user.dto';
+import { UpdateUserDto } from './update-user.dto';
 
 @Injectable()
 export class UserService {
@@ -13,9 +15,9 @@ export class UserService {
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
 
-  async create(user: User): Promise<User> {
+  async create(createUserDto: CreateUserDto): Promise<User> {
     await this.cacheManager.del('users_all');
-    return this.userRepository.save(user);
+    return this.userRepository.save(createUserDto);
   }
 
   @CacheKey('users_all')
@@ -42,10 +44,10 @@ export class UserService {
     return user;
   }
 
-  async update(id: number, user: User): Promise<any> {
+  async update(id: number, updateUserDto: UpdateUserDto): Promise<any> {
     await this.cacheManager.del('users_all');
     await this.cacheManager.del(`user_${id}`);
-    const result = await this.userRepository.update(id, user);
+    const result = await this.userRepository.update(id, updateUserDto);
     return result;
   }
 
