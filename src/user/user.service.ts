@@ -6,12 +6,15 @@ import { CACHE_MANAGER, CacheKey, CacheTTL } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
 import { CreateUserDto } from './create-user.dto';
 import { UpdateUserDto } from './update-user.dto';
+import { Block } from 'src/block/block.entity';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    @InjectRepository(Block)
+    private readonly blockRepository: Repository<Block>,
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
 
@@ -63,6 +66,7 @@ export class UserService {
     username?: string,
     minAge?: number,
     maxAge?: number,
+    userId?: number,
   ): Promise<User[]> {
     const cacheKey = `search_${username}_${minAge}_${maxAge}`;
     const cachedSearchResults = await this.cacheManager.get<User[]>(cacheKey);
@@ -105,6 +109,18 @@ export class UserService {
       queryBuilder.andWhere('user.birthdate >= :minBirthdate', {
         minBirthdate,
       });
+    }
+
+    if (userId) {
+      const blockedUsers = await this.blockRepository.find({
+        where: { blocker: { id: userId } },
+      });
+      const blockedUserIds = blockedUsers.map((block) => block.blocked.id);
+      if (blockedUserIds.length > 0) {
+        queryBuilder.andWhere('user.id NOT IN (:...blockedUserIds)', {
+          blockedUserIds,
+        });
+      }
     }
 
     const users = await queryBuilder.getMany();

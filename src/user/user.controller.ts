@@ -12,6 +12,7 @@ import { UserService } from './user.service';
 import { User } from './user.entity';
 import { CreateUserDto } from './create-user.dto';
 import { UpdateUserDto } from './update-user.dto';
+import { UserId } from '../common/user-id.decorator';
 
 @Controller('users')
 export class UserController {
@@ -47,10 +48,11 @@ export class UserController {
 
   @Get('search')
   search(
+    @UserId() userId: number,
     @Query('username') username?: string,
     @Query('minAge') minAge?: number,
     @Query('maxAge') maxAge?: number,
   ): Promise<User[]> {
-    return this.userService.search(username, minAge, maxAge);
+    return this.userService.search(username, minAge, maxAge, userId);
   }
 }
