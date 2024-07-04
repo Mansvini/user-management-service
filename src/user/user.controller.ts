@@ -6,6 +6,7 @@ import {
   Param,
   Delete,
   Put,
+  Query,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { User } from './user.entity';
@@ -37,5 +38,14 @@ export class UserController {
   @Delete(':id')
   remove(@Param('id') id: number): Promise<void> {
     return this.userService.remove(id);
+  }
+
+  @Get('search')
+  search(
+    @Query('username') username?: string,
+    @Query('minAge') minAge?: number,
+    @Query('maxAge') maxAge?: number,
+  ): Promise<User[]> {
+    return this.userService.search(username, minAge, maxAge);
   }
 }
