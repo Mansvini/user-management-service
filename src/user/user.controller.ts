@@ -49,7 +49,7 @@ export class UserController {
   @Post('search')
   search(
     @Body() searchUserDto: SearchUserDto,
-    @UserId() userId: number,
+    @UserId('optional') userId: number,
   ): Promise<User[]> {
     return this.userService.search(searchUserDto, userId);
   }
