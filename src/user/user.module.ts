@@ -4,7 +4,7 @@ import { UserService } from './user.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './user.entity';
 import { CacheModule } from '@nestjs/cache-manager';
-import { Block } from 'src/block/block.entity';
+import { Block } from '../block/block.entity';
 
 @Module({
   imports: [TypeOrmModule.forFeature([User, Block]), CacheModule.register()],
