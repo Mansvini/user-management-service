@@ -102,7 +102,7 @@ describe('UserService', () => {
       const result = await service.findAll();
       expect(result).toEqual(users);
       expect(userRepository.find).toHaveBeenCalled();
-      expect(cacheManager.set).toHaveBeenCalledWith('users_all', users, 0);
+      expect(cacheManager.set).toHaveBeenCalledWith('users_all', users);
     });
   });
 
@@ -125,7 +125,7 @@ describe('UserService', () => {
       const result = await service.findOne(1);
       expect(result).toEqual(user);
       expect(userRepository.findOne).toHaveBeenCalledWith({ where: { id: 1 } });
-      expect(cacheManager.set).toHaveBeenCalledWith('user_1', user, 0);
+      expect(cacheManager.set).toHaveBeenCalledWith('user_1', user);
     });
   });
 
@@ -184,7 +184,6 @@ describe('UserService', () => {
       expect(cacheManager.set).toHaveBeenCalledWith(
         'search_john_20_30_1',
         searchResults,
-        0,
       );
     });
   });
