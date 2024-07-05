@@ -1,73 +1,214 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
+```markdown
+# User Management Service
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+This is a NestJS-based user management service that allows you to create, read, update, delete, block, unblock, and search for users.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Table of Contents
 
-## Description
+- [User Management Service](#user-management-service)
+  - [Table of Contents](#table-of-contents)
+  - [Project Setup](#project-setup)
+  - [Database Setup](#database-setup)
+  - [Environment Variables](#environment-variables)
+  - [Running the Application](#running-the-application)
+  - [Testing](#testing)
+  - [Endpoints](#endpoints)
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## Project Setup
 
-## Installation
+1. **Clone the repository:**
 
-```bash
-$ npm install
+    ```bash
+    git clone <repository-url>
+    cd <repository-directory>
+    ```
+
+2. **Install dependencies:**
+
+    ```bash
+    npm install
+    ```
+
+## Database Setup
+
+This project uses PostgreSQL as the database. Ensure you have PostgreSQL installed and running on your machine.
+
+1. **Create a database:**
+
+    ```bash
+    createdb user_management
+    ```
+
+## Environment Variables
+
+Create a `.env` file in the root directory and configure the following variables:
+
+```plaintext
+# Application
+PORT=3000
+
+# Database
+DB_HOST=localhost
+DB_PORT=5432
+DB_USERNAME=your_username
+DB_PASSWORD=your_password
+DB_NAME=user_management
+
+# JWT
+JWT_SECRET=your_jwt_secret
+
+# Cache
+CACHE_TTL=300
+CACHE_MAX=100  # Maximum number of items in cache
 ```
 
-## Running the app
+## Running the Application
+
+1. **Start the application:**
+
+    ```bash
+    npm run start
+    ```
+
+    The application will be running at `http://localhost:3000`.
+
+2. **Start the application with hot reload (for development):**
+
+    ```bash
+    npm run start:dev
+    ```
+
+## Testing
+
+This project uses Jest for testing.
+
+1. **Run unit tests:**
+
+    ```bash
+    npm run test
+    ```
+
+2. **Run tests with coverage:**
+
+    ```bash
+    npm run test:cov
+    ```
+
+3. **Run end-to-end tests:**
+
+    ```bash
+    npm run test:e2e
+    ```
+
+## Endpoints
+
+Here are some of the main endpoints provided by this service:
+
+### User Endpoints
+
+- **Create a user:**
+
+    ```http
+    POST /users
+    ```
+
+    Request Body:
+
+    ```json
+    {
+      "name": "John",
+      "surname": "Doe",
+      "username": "johndoe",
+      "birthdate": "1990-01-01"
+    }
+    ```
+
+- **Get all users:**
+
+    ```http
+    GET /users
+    ```
+
+- **Get a user by ID:**
+
+    ```http
+    GET /users/:id
+    ```
+
+- **Update a user by ID:**
+
+    ```http
+    PATCH /users/:id
+    ```
+
+    Request Body:
+
+    ```json
+    {
+      "name": "John"
+    }
+    ```
+
+- **Delete a user by ID:**
+
+    ```http
+    DELETE /users/:id
+    ```
+
+- **Search users:**
+
+    ```http
+    POST /users/search
+    ```
+
+    Request Body:
+
+    ```json
+    {
+      "username": "john",
+      "minAge": 20,
+      "maxAge": 30
+    }
+    ```
+
+### Block Endpoints
+
+- **Block a user:**
+
+    ```http
+    POST /block/:blockedId
+    ```
+
+- **Unblock a user:**
+
+    ```http
+    DELETE /block/:blockedId
+    ```
+
+## Including JWT in Requests
+
+To include a JWT token in your requests to Block or search endpoints, you need to add an `Authorization` header with the `Bearer` token. Please note that it is mandatory to add JWT token for Block endpoints.
+
+### Example with cURL
 
 ```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+curl -X GET http://localhost:3000/users \
+  -H "Authorization: Bearer <your_jwt_token>"
 ```
 
-## Test
+### Example with Postman
 
-```bash
-# unit tests
-$ npm run test
+1. Open Postman.
+2. Select the request type (e.g., GET).
+3. Enter the request URL (e.g., `http://localhost:3000/users`).
+4. Go to the `Headers` tab.
+5. Add a new header:
+    - Key: `Authorization`
+    - Value: `Bearer <your_jwt_token>`
+6. Send the request.
 
-# e2e tests
-$ npm run test:e2e
+### Generating JWT Token
 
-# test coverage
-$ npm run test:cov
-```
+You can generate a JWT token using your authentication endpoint (if implemented) or using online tools for testing purposes. Ensure the token includes the necessary payload and is signed with the secret specified in your `.env` file.
 
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](LICENSE).
+The JWT token should contain user id in the `sub` property of the object.
