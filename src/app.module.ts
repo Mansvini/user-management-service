@@ -10,12 +10,9 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
 
 @Module({
   imports: [
-    CacheModule.register({
-      ttl: 300, // seconds
-      max: 100, // maximum number of items in cache
-    }),
     ConfigModule.forRoot({
       isGlobal: true,
+      envFilePath: '.env',
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
@@ -25,9 +22,17 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
         port: configService.get<number>('DB_PORT'),
         username: configService.get<string>('DB_USERNAME'),
         password: configService.get<string>('DB_PASSWORD'),
-        database: configService.get<string>('DB_DATABASE'),
+        database: configService.get<string>('DB_NAME'),
         entities: [__dirname + '/**/*.entity{.ts,.js}'],
         synchronize: true,
+      }),
+      inject: [ConfigService],
+    }),
+    CacheModule.registerAsync({
+      imports: [ConfigModule],
+      useFactory: (configService: ConfigService) => ({
+        ttl: parseInt(configService.get<string>('CACHE_TTL'), 10),
+        max: parseInt(configService.get<string>('CACHE_MAX'), 10),
       }),
       inject: [ConfigService],
     }),
