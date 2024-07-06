@@ -136,7 +136,7 @@ Here are some of the main endpoints provided by this service:
 - **Update a user by ID:**
 
     ```http
-    PATCH /users/:id
+    PUT /users/:id
     ```
 
     Request Body:
