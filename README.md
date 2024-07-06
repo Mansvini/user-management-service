@@ -1,4 +1,3 @@
-```markdown
 # User Management Service
 
 This is a NestJS-based user management service that allows you to create, read, update, delete, block, unblock, and search for users.
@@ -60,7 +59,6 @@ JWT_SECRET=your_jwt_secret
 # Cache
 CACHE_TTL=300
 CACHE_MAX=100  # Maximum number of items in cache
-```
 
 ## Running the Application
 
