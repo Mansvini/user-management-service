@@ -53,12 +53,11 @@ DB_USERNAME=your_username
 DB_PASSWORD=your_password
 DB_NAME=user_management
 
-# JWT
-JWT_SECRET=your_jwt_secret
-
 # Cache
 CACHE_TTL=300
 CACHE_MAX=100  # Maximum number of items in cache
+
+```
 
 ## Running the Application
 
@@ -185,6 +184,10 @@ Here are some of the main endpoints provided by this service:
 
 ## Including JWT in Requests
 
+### Generating JWT Token
+
+You can generate a JWT token using online tools like `jwt.io` for testing purposes. Ensure the token includes the necessary user id in the `sub` property of the payload.
+
 To include a JWT token in your requests to Block or search endpoints, you need to add an `Authorization` header with the `Bearer` token. Please note that it is mandatory to add JWT token for Block endpoints.
 
 ### Example with cURL
@@ -205,8 +208,3 @@ curl -X GET http://localhost:3000/users \
     - Value: `Bearer <your_jwt_token>`
 6. Send the request.
 
-### Generating JWT Token
-
-You can generate a JWT token using your authentication endpoint (if implemented) or using online tools for testing purposes. Ensure the token includes the necessary payload and is signed with the secret specified in your `.env` file.
-
-The JWT token should contain user id in the `sub` property of the object.
