@@ -12,6 +12,7 @@ This is a NestJS-based user management service that allows you to create, read, 
   - [Running the Application](#running-the-application)
   - [Testing](#testing)
   - [Endpoints](#endpoints)
+  - [Including JWT in Requests](#including-jwt-in-requests)
 
 ## Project Setup
 
