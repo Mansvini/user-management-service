@@ -80,29 +80,20 @@ export class UserService {
     }
 
     if (minAge && maxAge) {
-      const minBirthdate = new Date();
-      minBirthdate.setFullYear(minBirthdate.getFullYear() - maxAge);
-      const maxBirthdate = new Date();
-      maxBirthdate.setFullYear(maxBirthdate.getFullYear() - minAge);
       queryBuilder.andWhere(
-        'user.birthdate BETWEEN :minBirthdate AND :maxBirthdate',
-        {
-          minBirthdate,
-          maxBirthdate,
-        },
+        `date_part('year', age(user.birthdate)) BETWEEN :minAge AND :maxAge`,
+        { minAge, maxAge },
       );
     } else if (minAge) {
-      const maxBirthdate = new Date();
-      maxBirthdate.setFullYear(maxBirthdate.getFullYear() - minAge);
-      queryBuilder.andWhere('user.birthdate <= :maxBirthdate', {
-        maxBirthdate,
-      });
+      queryBuilder.andWhere(
+        `date_part('year', age(user.birthdate)) >= :minAge`,
+        { minAge },
+      );
     } else if (maxAge) {
-      const minBirthdate = new Date();
-      minBirthdate.setFullYear(minBirthdate.getFullYear() - maxAge);
-      queryBuilder.andWhere('user.birthdate >= :minBirthdate', {
-        minBirthdate,
-      });
+      queryBuilder.andWhere(
+        `date_part('year', age(user.birthdate)) <= :maxAge`,
+        { maxAge },
+      );
     }
 
     if (userId) {
