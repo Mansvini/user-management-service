@@ -39,6 +39,36 @@ This project uses PostgreSQL as the database. Ensure you have PostgreSQL install
     createdb user_management
     ```
 
+2. **Create tables**:
+    
+    You can create tables manually using SQL commands or rely on TypeORM to synchronize the entities and create tables automatically. If you're using TypeORM's automatic synchronization, it will create tables based on your entity definitions. Ensure `synchronize: true` is set in your TypeORM configuration.
+
+    Example SQL commands to create tables manually:
+    ```sql
+    CREATE TABLE users (
+        id SERIAL PRIMARY KEY,
+        name VARCHAR(255) NOT NULL,
+        surname VARCHAR(255) NOT NULL,
+        username VARCHAR(255) UNIQUE NOT NULL,
+        birthdate DATE NOT NULL
+    );
+
+    CREATE TABLE blocks (
+        id SERIAL PRIMARY KEY,
+        blocker_id INT REFERENCES users(id),
+        blocked_id INT REFERENCES users(id)
+    );
+    ```
+
+3. **Run database migrations (if any)**:
+
+    If you're using TypeORM, you can run migrations using:
+
+    ```bash
+    npm run typeorm migration:run
+    ```
+
+
 ## Environment Variables
 
 Create a `.env` file in the root directory and configure the following variables:
